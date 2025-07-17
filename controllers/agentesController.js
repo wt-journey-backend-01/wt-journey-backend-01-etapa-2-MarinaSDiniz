@@ -1,7 +1,7 @@
-const agentesController = require('../repositories/agentesRepository');
+const agentesRepository = require('../repositories/agentesRepository');
 function getAllAgentes(req, res) {
 
-    const agentes = agentesController.findAll();
+    const agentes = agentesRepository.findAll();
     res.json(agentes);
 
 }
