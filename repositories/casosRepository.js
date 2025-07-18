@@ -39,6 +39,37 @@ const casos = [
 function findAll() {
     return casos;
 }
+
+function findById(id) {
+    return casos.find(caso => caso.id === id);
+}
+
+function create(novoCaso) {
+    casos.push(novoCaso);
+    return novoCaso;
+}
+
+function update(id, dadosAtualizados) {
+    const index = casos.findIndex(caso => caso.id === id);
+    if (index !== -1) {
+        casos[index] = { ...casos[index], ...dadosAtualizados };
+        return casos[index];
+    }
+    return null;
+}
+
+function deleteById(id) {
+    const index = casos.findIndex(caso => caso.id === id);
+    if (index !== -1) {
+        return casos.splice(index, 1)[0];
+    }
+    return null;
+}
+
 module.exports = {
-    findAll
+    findAll,
+    findById,
+    create,
+    update,
+    deleteById
 };
