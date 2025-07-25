@@ -29,8 +29,8 @@ app.get('/', (req, res) => {
     });
 });
 
-app.use(agentesRouter);
-app.use(casosRouter);
+app.use('/agentes', agentesRouter);
+app.use('/casos', casosRouter);
 
 // Middleware de tratamento de erros deve ser o último
 app.use(errorHandler);

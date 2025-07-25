@@ -31,7 +31,7 @@ const agentesController = require('../controllers/agentesController');
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.get('/agentes', agentesController.getAllAgentes);
+router.get('/', agentesController.getAllAgentes);
 
 /**
  * @swagger
@@ -61,7 +61,7 @@ router.get('/agentes', agentesController.getAllAgentes);
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.get('/agentes/:id', agentesController.getAgenteById);
+router.get('/:id', agentesController.getAgenteById);
 
 /**
  * @swagger
@@ -105,7 +105,7 @@ router.get('/agentes/:id', agentesController.getAgenteById);
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.post('/agentes', agentesController.createAgente);
+router.post('/', agentesController.createAgente);
 
 /**
  * @swagger
@@ -153,7 +153,54 @@ router.post('/agentes', agentesController.createAgente);
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.put('/agentes/:id', agentesController.updateAgente);
+router.put('/:id', agentesController.updateAgente);
+
+/**
+ * @swagger
+ * /agentes/{id}:
+ *   patch:
+ *     summary: Atualiza parcialmente um agente
+ *     tags: [Agentes]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         required: true
+ *         description: ID único do agente
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               nome:
+ *                 type: string
+ *                 example: "João Silva"
+ *               dataDeIncorporacao:
+ *                 type: string
+ *                 format: date
+ *                 example: "2024/01/15"
+ *               cargo:
+ *                 type: string
+ *                 example: "Agente"
+ *     responses:
+ *       200:
+ *         description: Agente atualizado com sucesso
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Agente'
+ *       404:
+ *         description: Agente não encontrado
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ */
+router.patch('/:id', agentesController.patchAgente);
 
 /**
  * @swagger
@@ -189,6 +236,6 @@ router.put('/agentes/:id', agentesController.updateAgente);
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.delete('/agentes/:id', agentesController.deleteAgente);
+router.delete('/:id', agentesController.deleteAgente);
 
 module.exports = router;

@@ -31,7 +31,7 @@ const casosController = require('../controllers/casosController');
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.get('/casos', casosController.getAllCasos);
+router.get('/', casosController.getAllCasos);
 
 /**
  * @swagger
@@ -61,7 +61,7 @@ router.get('/casos', casosController.getAllCasos);
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.get('/casos/:id', casosController.getCasoById);
+router.get('/:id', casosController.getCasoById);
 
 /**
  * @swagger
@@ -109,7 +109,7 @@ router.get('/casos/:id', casosController.getCasoById);
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.post('/casos', casosController.createCaso);
+router.post('/', casosController.createCaso);
 
 /**
  * @swagger
@@ -160,7 +160,11 @@ router.post('/casos', casosController.createCaso);
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.put('/casos/:id', casosController.updateCaso);
+// PUT /casos/:id - Atualizar caso completo
+router.put('/:id', casosController.updateCaso);
+
+// PATCH /casos/:id - Atualizar caso parcialmente
+router.patch('/:id', casosController.patchCaso);
 
 /**
  * @swagger
@@ -196,6 +200,6 @@ router.put('/casos/:id', casosController.updateCaso);
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.delete('/casos/:id', casosController.deleteCaso);
+router.delete('/:id', casosController.deleteCaso);
 
 module.exports = router;

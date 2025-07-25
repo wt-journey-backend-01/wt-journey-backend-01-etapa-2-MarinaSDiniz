@@ -71,6 +71,23 @@ const updateAgente = (req, res, next) => {
     }
 }
 
+const patchAgente = (req, res, next) => {
+    try {
+        const { id } = req.params;
+        const dadosAtualizados = req.body;
+        
+        const agenteAtualizado = agentesRepository.update(id, dadosAtualizados);
+        
+        if (!agenteAtualizado) {
+            throw new APIerror('Agente não encontrado', 404);
+        }
+        
+        res.status(200).json(agenteAtualizado);
+    } catch (error) {
+        next(error);
+    }
+}
+
 const deleteAgente = (req, res, next) => {
     try {
         const { id } = req.params;
@@ -91,5 +108,6 @@ module.exports = {
     getAgenteById,
     createAgente,
     updateAgente,
+    patchAgente,
     deleteAgente
 };

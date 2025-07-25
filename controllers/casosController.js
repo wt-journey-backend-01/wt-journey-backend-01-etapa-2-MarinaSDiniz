@@ -1,4 +1,5 @@
 const casosRepository = require("../repositories/casosRepository")
+const agentesRepository = require("../repositories/agentesRepository")
 const { v4: uuidv4 } = require('uuid');
 
 class APIerror extends Error {
@@ -40,6 +41,12 @@ const createCaso = (req, res, next) => {
             throw new APIerror('Campos obrigatórios: titulo, descricao, agente_id', 400);
         }
         
+        // Validar se o agente existe
+        const agenteExiste = agentesRepository.findById(agente_id);
+        if (!agenteExiste) {
+            throw new APIerror('Agente não encontrado para o agente_id informado', 404);
+        }
+        
         const novoCaso = {
             id: uuidv4(),
             titulo,
@@ -59,6 +66,39 @@ const updateCaso = (req, res, next) => {
     try {
         const { id } = req.params;
         const dadosAtualizados = req.body;
+        
+        // Se agente_id está sendo atualizado, validar se existe
+        if (dadosAtualizados.agente_id) {
+            const agenteExiste = agentesRepository.findById(dadosAtualizados.agente_id);
+            if (!agenteExiste) {
+                throw new APIerror('Agente não encontrado para o agente_id informado', 404);
+            }
+        }
+        
+        const casoAtualizado = casosRepository.update(id, dadosAtualizados);
+        
+        if (!casoAtualizado) {
+            throw new APIerror('Caso não encontrado', 404);
+        }
+        
+        res.status(200).json(casoAtualizado);
+    } catch (error) {
+        next(error);
+    }
+}
+
+const patchCaso = (req, res, next) => {
+    try {
+        const { id } = req.params;
+        const dadosAtualizados = req.body;
+        
+        // Se agente_id está sendo atualizado, validar se existe
+        if (dadosAtualizados.agente_id) {
+            const agenteExiste = agentesRepository.findById(dadosAtualizados.agente_id);
+            if (!agenteExiste) {
+                throw new APIerror('Agente não encontrado para o agente_id informado', 404);
+            }
+        }
         
         const casoAtualizado = casosRepository.update(id, dadosAtualizados);
         
@@ -92,5 +132,6 @@ module.exports = {
     getCasoById,
     createCaso,
     updateCaso,
+    patchCaso,
     deleteCaso
 }
