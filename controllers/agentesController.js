@@ -28,6 +28,9 @@ const getAllAgentes = (req, res, next) => {
         
         // Filtrar por cargo se fornecido
         if (cargo) {
+            if (!isValidCargo(cargo)) {
+                throw new APIerror('Cargo inválido. Valores permitidos: delegado, investigador, perito, agente, auxiliar', 400);
+            }
             agentes = agentes.filter(agente => 
                 agente.cargo.toLowerCase() === cargo.toLowerCase()
             );
@@ -40,11 +43,28 @@ const getAllAgentes = (req, res, next) => {
             );
         }
         
-        // Ordenar por data de incorporação se solicitado
-        if (ordenar === 'dataIncorporacao' || ordenar === 'data') {
-            agentes.sort((a, b) => new Date(a.dataDeIncorporacao) - new Date(b.dataDeIncorporacao));
-        } else if (ordenar === 'nome') {
-            agentes.sort((a, b) => a.nome.localeCompare(b.nome));
+        // Ordenar conforme solicitado
+        if (ordenar) {
+            switch (ordenar.toLowerCase()) {
+                case 'data':
+                case 'dataincorporacao':
+                case 'data_asc':
+                    agentes.sort((a, b) => new Date(a.dataDeIncorporacao) - new Date(b.dataDeIncorporacao));
+                    break;
+                case 'data_desc':
+                case 'dataincorporacao_desc':
+                    agentes.sort((a, b) => new Date(b.dataDeIncorporacao) - new Date(a.dataDeIncorporacao));
+                    break;
+                case 'nome':
+                case 'nome_asc':
+                    agentes.sort((a, b) => a.nome.localeCompare(b.nome));
+                    break;
+                case 'nome_desc':
+                    agentes.sort((a, b) => b.nome.localeCompare(a.nome));
+                    break;
+                default:
+                    throw new APIerror('Parâmetro de ordenação inválido. Use: data, data_desc, nome, nome_desc', 400);
+            }
         }
         
         res.status(200).json(agentes);
@@ -106,33 +126,53 @@ const updateAgente = (req, res, next) => {
         const { id } = req.params;
         const dadosAtualizados = req.body;
         
+        // Verificar se o payload não está vazio
+        if (!dadosAtualizados || Object.keys(dadosAtualizados).length === 0) {
+            throw new APIerror('Payload vazio. Envie pelo menos um campo para atualizar.', 400);
+        }
+        
         // Impedir alteração do ID
         if (dadosAtualizados.id) {
             throw new APIerror('Não é permitido alterar o ID do agente', 400);
         }
         
+        // Verificar se o agente existe antes de tentar atualizar
+        const agenteExistente = agentesRepository.findById(id);
+        if (!agenteExistente) {
+            throw new APIerror('Agente não encontrado', 404);
+        }
+        
+        // Validar campos obrigatórios para PUT (atualização completa)
+        const { nome, dataDeIncorporacao, cargo } = dadosAtualizados;
+        if (!nome || !dataDeIncorporacao || !cargo) {
+            throw new APIerror('PUT requer todos os campos: nome, dataDeIncorporacao, cargo', 400);
+        }
+        
         // Validar campos se fornecidos
-        if (dadosAtualizados.dataDeIncorporacao && !isValidDate(dadosAtualizados.dataDeIncorporacao)) {
+        if (dataDeIncorporacao && !isValidDate(dataDeIncorporacao)) {
             throw new APIerror('dataDeIncorporacao inválida ou no futuro. Use formato YYYY-MM-DD ou YYYY/MM/DD', 400);
         }
         
-        if (dadosAtualizados.cargo && !isValidCargo(dadosAtualizados.cargo)) {
+        if (cargo && !isValidCargo(cargo)) {
             throw new APIerror('Cargo inválido. Valores permitidos: delegado, investigador, perito, agente, auxiliar', 400);
         }
         
+        // Validar tipos de dados
+        if (nome && typeof nome !== 'string') {
+            throw new APIerror('Campo nome deve ser uma string', 400);
+        }
+        if (cargo && typeof cargo !== 'string') {
+            throw new APIerror('Campo cargo deve ser uma string', 400);
+        }
+        
         // Limpar e padronizar dados
-        if (dadosAtualizados.nome) {
-            dadosAtualizados.nome = dadosAtualizados.nome.trim();
-        }
-        if (dadosAtualizados.cargo) {
-            dadosAtualizados.cargo = dadosAtualizados.cargo.toLowerCase();
-        }
+        const dadosLimpos = {
+            nome: nome.trim(),
+            dataDeIncorporacao,
+            cargo: cargo.toLowerCase()
+        };
         
-        const agenteAtualizado = agentesRepository.update(id, dadosAtualizados);
-        
-        if (!agenteAtualizado) {
-            throw new APIerror('Agente não encontrado', 404);
-        }
+        const agenteAtualizado = agentesRepository.update(id, dadosLimpos);
         
         res.status(200).json(agenteAtualizado);
     } catch (error) {
@@ -145,9 +185,20 @@ const patchAgente = (req, res, next) => {
         const { id } = req.params;
         const dadosAtualizados = req.body;
         
+        // Verificar se o payload não está vazio
+        if (!dadosAtualizados || Object.keys(dadosAtualizados).length === 0) {
+            throw new APIerror('Payload vazio. Envie pelo menos um campo para atualizar.', 400);
+        }
+        
         // Impedir alteração do ID
         if (dadosAtualizados.id) {
             throw new APIerror('Não é permitido alterar o ID do agente', 400);
+        }
+        
+        // Verificar se o agente existe antes de tentar atualizar
+        const agenteExistente = agentesRepository.findById(id);
+        if (!agenteExistente) {
+            throw new APIerror('Agente não encontrado', 404);
         }
         
         // Validar campos se fornecidos
@@ -157,6 +208,14 @@ const patchAgente = (req, res, next) => {
         
         if (dadosAtualizados.cargo && !isValidCargo(dadosAtualizados.cargo)) {
             throw new APIerror('Cargo inválido. Valores permitidos: delegado, investigador, perito, agente, auxiliar', 400);
+        }
+        
+        // Validar tipos de dados
+        if (dadosAtualizados.nome && typeof dadosAtualizados.nome !== 'string') {
+            throw new APIerror('Campo nome deve ser uma string', 400);
+        }
+        if (dadosAtualizados.cargo && typeof dadosAtualizados.cargo !== 'string') {
+            throw new APIerror('Campo cargo deve ser uma string', 400);
         }
         
         // Limpar e padronizar dados
@@ -169,10 +228,6 @@ const patchAgente = (req, res, next) => {
         
         const agenteAtualizado = agentesRepository.update(id, dadosAtualizados);
         
-        if (!agenteAtualizado) {
-            throw new APIerror('Agente não encontrado', 404);
-        }
-        
         res.status(200).json(agenteAtualizado);
     } catch (error) {
         next(error);
@@ -182,11 +237,14 @@ const patchAgente = (req, res, next) => {
 const deleteAgente = (req, res, next) => {
     try {
         const { id } = req.params;
-        const agenteRemovido = agentesRepository.deleteById(id);
         
-        if (!agenteRemovido) {
+        // Verificar se o agente existe antes de tentar remover
+        const agenteExistente = agentesRepository.findById(id);
+        if (!agenteExistente) {
             throw new APIerror('Agente não encontrado', 404);
         }
+        
+        const agenteRemovido = agentesRepository.deleteById(id);
         
         res.status(200).json({ message: 'Agente removido com sucesso', agente: agenteRemovido });
     } catch (error) {

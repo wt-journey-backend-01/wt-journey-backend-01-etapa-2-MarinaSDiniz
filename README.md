@@ -63,33 +63,55 @@ Acesse a documentação interativa em: **http://localhost:3000/api-docs**
 - Data de incorporação deve ser válida e não pode ser no futuro
 - Cargo deve ser um dos valores: `delegado`, `investigador`, `perito`, `agente`, `auxiliar`
 - ID não pode ser alterado em operações PUT/PATCH
+- Validação de tipos de dados (strings)
+- Payload não pode estar vazio
 
 #### **Casos:**
 - Título, descrição e agente_id são obrigatórios
 - agente_id deve referenciar um agente existente (integridade referencial)
-- Status deve ser um dos valores: `aberto`, `fechado`, `solucionado`
+- Status deve ser um dos valores: `aberto`, `fechado`, `em_andamento`
 - ID não pode ser alterado em operações PUT/PATCH
+- Validação de tipos de dados
+- Payload não pode estar vazio
+
+### 🎯 Filtros e Ordenação Avançados
+
+#### **Agentes:**
+- **Filtros:** `cargo` (com validação), `busca` (busca por nome)
+- **Ordenação:** `data`/`data_asc`, `data_desc`, `nome`/`nome_asc`, `nome_desc`
+- **Exemplo:** `GET /agentes?cargo=investigador&ordenar=data_desc`
+
+#### **Casos:**
+- **Filtros:** `status` (com validação), `agente_id` (com validação de existência), `keyword` (busca em título/descrição)
+- **Ordenação:** `data`/`data_desc`, `data_asc`, `titulo`/`titulo_asc`, `titulo_desc`
+- **Exemplo:** `GET /casos?status=aberto&ordenar=data&keyword=roubo`
 
 ### 🎯 Exemplos de Uso
 
-#### Criar um agente:
+#### Criar um caso:
 ```bash
-POST /agentes
+POST /casos
 {
-  "nome": "João Silva",
-  "dataDeIncorporacao": "2020-01-15", 
-  "cargo": "investigador"
+  "titulo": "Roubo na Rua das Flores",
+  "descricao": "Roubo a residência com arrombamento de porta",
+  "status": "aberto",
+  "agente_id": "401bccf5-cf9e-489d-8412-446cd169a0f1"
 }
 ```
 
-#### Filtrar casos por status:
+#### Filtrar casos por status com ordenação:
 ```bash
-GET /casos?status=aberto&ordenar=data
+GET /casos?status=em_andamento&ordenar=data_desc
 ```
 
-#### Buscar agentes por cargo:
+#### Buscar agentes por cargo com ordenação:
 ```bash  
-GET /agentes?cargo=delegado&ordenar=nome
+GET /agentes?cargo=delegado&ordenar=nome_asc
+```
+
+#### Filtros combinados para casos:
+```bash
+GET /casos?agente_id=401bccf5-cf9e-489d-8412-446cd169a0f1&keyword=roubo&ordenar=titulo
 ```
 
 # Executar em modo de desenvolvimento (com watch)

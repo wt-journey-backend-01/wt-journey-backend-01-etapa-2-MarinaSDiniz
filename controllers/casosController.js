@@ -5,7 +5,7 @@ const { APIerror } = require('../utils/errorHandler');
 
 // Função para validar status
 function isValidStatus(status) {
-    const validStatus = ['aberto', 'fechado', 'solucionado'];
+    const validStatus = ['aberto', 'fechado', 'em_andamento'];
     return validStatus.includes(status.toLowerCase());
 }
 
@@ -16,6 +16,9 @@ const getAllCasos = (req, res, next) => {
         
         // Filtrar por status se fornecido
         if (status) {
+            if (!isValidStatus(status)) {
+                throw new APIerror('Status inválido. Valores permitidos: aberto, fechado, em_andamento', 400);
+            }
             casos = casos.filter(caso => 
                 caso.status.toLowerCase() === status.toLowerCase()
             );
@@ -23,6 +26,10 @@ const getAllCasos = (req, res, next) => {
         
         // Filtrar por agente responsável se fornecido
         if (agente_id) {
+            const agenteExiste = agentesRepository.findById(agente_id);
+            if (!agenteExiste) {
+                throw new APIerror('Agente não encontrado para o agente_id informado', 404);
+            }
             casos = casos.filter(caso => caso.agente_id === agente_id);
         }
         
@@ -34,11 +41,26 @@ const getAllCasos = (req, res, next) => {
             );
         }
         
-        // Ordenar se solicitado
-        if (ordenar === 'data') {
-            casos.sort((a, b) => new Date(b.dataOcorrencia) - new Date(a.dataOcorrencia)); // Mais recentes primeiro
-        } else if (ordenar === 'titulo') {
-            casos.sort((a, b) => a.titulo.localeCompare(b.titulo));
+        // Ordenar conforme solicitado
+        if (ordenar) {
+            switch (ordenar.toLowerCase()) {
+                case 'data':
+                case 'data_desc':
+                    casos.sort((a, b) => new Date(b.dataOcorrencia) - new Date(a.dataOcorrencia)); // Mais recentes primeiro
+                    break;
+                case 'data_asc':
+                    casos.sort((a, b) => new Date(a.dataOcorrencia) - new Date(b.dataOcorrencia)); // Mais antigos primeiro
+                    break;
+                case 'titulo':
+                case 'titulo_asc':
+                    casos.sort((a, b) => a.titulo.localeCompare(b.titulo));
+                    break;
+                case 'titulo_desc':
+                    casos.sort((a, b) => b.titulo.localeCompare(a.titulo));
+                    break;
+                default:
+                    throw new APIerror('Parâmetro de ordenação inválido. Use: data, data_asc, titulo, titulo_desc', 400);
+            }
         }
         
         res.status(200).json(casos);
@@ -80,7 +102,7 @@ const createCaso = (req, res, next) => {
         // Validar status se fornecido
         const statusFinal = status || 'aberto';
         if (!isValidStatus(statusFinal)) {
-            throw new APIerror('Status inválido. Valores permitidos: aberto, fechado, solucionado', 400);
+            throw new APIerror('Status inválido. Valores permitidos: aberto, fechado, em_andamento', 400);
         }
         
         const novoCaso = {
@@ -119,7 +141,7 @@ const updateCaso = (req, res, next) => {
         
         // Validar status se fornecido
         if (dadosAtualizados.status && !isValidStatus(dadosAtualizados.status)) {
-            throw new APIerror('Status inválido. Valores permitidos: aberto, fechado, solucionado', 400);
+            throw new APIerror('Status inválido. Valores permitidos: aberto, fechado, em_andamento', 400);
         }
         
         // Limpar e padronizar dados
@@ -165,7 +187,7 @@ const patchCaso = (req, res, next) => {
         
         // Validar status se fornecido
         if (dadosAtualizados.status && !isValidStatus(dadosAtualizados.status)) {
-            throw new APIerror('Status inválido. Valores permitidos: aberto, fechado, solucionado', 400);
+            throw new APIerror('Status inválido. Valores permitidos: aberto, fechado, em_andamento', 400);
         }
         
         // Limpar e padronizar dados
