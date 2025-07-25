@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API do Departamento de Polícia - Documentação</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #fafafa;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 0;
+            text-align: center;
+            margin-bottom: 40px;
+            border-radius: 8px;
+        }
+        
+        .header h1 {
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+        
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .info-box {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        
+        .endpoint {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        
+        .endpoint-header {
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .method {
+            padding: 5px 12px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 0.9em;
+            color: white;
+        }
+        
+        .method.get { background-color: #61affe; }
+        .method.post { background-color: #49cc90; }
+        .method.put { background-color: #fca130; }
+        .method.delete { background-color: #f93e3e; }
+        
+        .endpoint-path {
+            font-family: monospace;
+            font-size: 1.1em;
+            color: #333;
+        }
+        
+        .endpoint-description {
+            color: #666;
+            margin-left: auto;
+        }
+        
+        .endpoint-details {
+            padding: 20px;
+            display: none;
+        }
+        
+        .endpoint.active .endpoint-details {
+            display: block;
+        }
+        
+        .section {
+            margin-bottom: 20px;
+        }
+        
+        .section h4 {
+            margin-bottom: 10px;
+            color: #333;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 5px;
+        }
+        
+        .schema {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+            padding: 15px;
+            font-family: monospace;
+            font-size: 0.9em;
+            overflow-x: auto;
+        }
+        
+        .tag {
+            display: inline-block;
+            background: #e9ecef;
+            color: #495057;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            margin-bottom: 10px;
+        }
+        
+        .tag.agentes { background: #cce5ff; color: #0066cc; }
+        .tag.casos { background: #ffe6cc; color: #cc6600; }
+        
+        .response-codes {
+            display: grid;
+            grid-template-columns: 80px 1fr;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .status-code {
+            font-weight: bold;
+            padding: 4px 8px;
+            border-radius: 4px;
+            text-align: center;
+            color: white;
+        }
+        
+        .status-200 { background: #28a745; }
+        .status-201 { background: #28a745; }
+        .status-400 { background: #dc3545; }
+        .status-404 { background: #dc3545; }
+        .status-500 { background: #6c757d; }
+        
+        .clickable {
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .clickable:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .base-url {
+            background: #e3f2fd;
+            border: 1px solid #bbdefb;
+            border-radius: 4px;
+            padding: 10px;
+            margin: 10px 0;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>API do Departamento de Polícia</h1>
+            <p>Documentação da API para gerenciamento de agentes e casos policiais</p>
+            <p><strong>Versão:</strong> 1.0.0</p>
+        </div>
+
+        <div class="info-box">
+            <h3>Informações Gerais</h3>
+            <div class="base-url">
+                <strong>URL Base:</strong> http://localhost:3000
+            </div>
+            <p><strong>Formato:</strong> JSON</p>
+            <p><strong>Autenticação:</strong> Não requerida (desenvolvimento)</p>
+            <p><strong>Content-Type:</strong> application/json</p>
+        </div>
+
+        <h2>Endpoints - Agentes</h2>
+        
+        <div class="endpoint clickable" onclick="toggleEndpoint(this)">
+            <div class="endpoint-header">
+                <span class="method get">GET</span>
+                <span class="endpoint-path">/agentes</span>
+                <span class="endpoint-description">Lista todos os agentes</span>
+            </div>
+            <div class="endpoint-details">
+                <div class="tag agentes">Agentes</div>
+                <div class="section">
+                    <h4>Descrição</h4>
+                    <p>Retorna uma lista com todos os agentes do departamento de polícia.</p>
+                </div>
+                <div class="section">
+                    <h4>Códigos de Resposta</h4>
+                    <div class="response-codes">
+                        <span class="status-code status-200">200</span>
+                        <span>Lista de agentes retornada com sucesso</span>
+                        <span class="status-code status-500">500</span>
+                        <span>Erro interno do servidor</span>
+                    </div>
+                </div>
+                <div class="section">
+                    <h4>Exemplo de Resposta (200)</h4>
+                    <div class="schema">
+[
+  {
+    "id": "401bccf5-cf9e-489d-8412-446cd169a0f1",
+    "nome": "Rommel Carneiro",
+    "dataDeIncorporacao": "1992/10/04",
+    "cargo": "delegado"
+  }
+]
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="endpoint clickable" onclick="toggleEndpoint(this)">
+            <div class="endpoint-header">
+                <span class="method get">GET</span>
+                <span class="endpoint-path">/agentes/{id}</span>
+                <span class="endpoint-description">Busca um agente por ID</span>
+            </div>
+            <div class="endpoint-details">
+                <div class="tag agentes">Agentes</div>
+                <div class="section">
+                    <h4>Parâmetros</h4>
+                    <p><strong>id</strong> (path, obrigatório): ID único do agente (UUID)</p>
+                </div>
+                <div class="section">
+                    <h4>Códigos de Resposta</h4>
+                    <div class="response-codes">
+                        <span class="status-code status-200">200</span>
+                        <span>Agente encontrado</span>
+                        <span class="status-code status-404">404</span>
+                        <span>Agente não encontrado</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="endpoint clickable" onclick="toggleEndpoint(this)">
+            <div class="endpoint-header">
+                <span class="method post">POST</span>
+                <span class="endpoint-path">/agentes</span>
+                <span class="endpoint-description">Cria um novo agente</span>
+            </div>
+            <div class="endpoint-details">
+                <div class="tag agentes">Agentes</div>
+                <div class="section">
+                    <h4>Body da Requisição</h4>
+                    <div class="schema">
+{
+  "nome": "João Silva",
+  "dataDeIncorporacao": "2024/01/15",
+  "cargo": "agente"
+}
+                    </div>
+                </div>
+                <div class="section">
+                    <h4>Campos Obrigatórios</h4>
+                    <ul>
+                        <li><strong>nome:</strong> Nome completo do agente</li>
+                        <li><strong>dataDeIncorporacao:</strong> Data no formato YYYY/MM/DD</li>
+                        <li><strong>cargo:</strong> delegado | investigador | perito | agente | auxiliar</li>
+                    </ul>
+                </div>
+                <div class="section">
+                    <h4>Códigos de Resposta</h4>
+                    <div class="response-codes">
+                        <span class="status-code status-201">201</span>
+                        <span>Agente criado com sucesso</span>
+                        <span class="status-code status-400">400</span>
+                        <span>Dados inválidos</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="endpoint clickable" onclick="toggleEndpoint(this)">
+            <div class="endpoint-header">
+                <span class="method put">PUT</span>
+                <span class="endpoint-path">/agentes/{id}</span>
+                <span class="endpoint-description">Atualiza um agente existente</span>
+            </div>
+            <div class="endpoint-details">
+                <div class="tag agentes">Agentes</div>
+                <div class="section">
+                    <h4>Parâmetros</h4>
+                    <p><strong>id</strong> (path, obrigatório): ID único do agente (UUID)</p>
+                </div>
+                <div class="section">
+                    <h4>Códigos de Resposta</h4>
+                    <div class="response-codes">
+                        <span class="status-code status-200">200</span>
+                        <span>Agente atualizado com sucesso</span>
+                        <span class="status-code status-404">404</span>
+                        <span>Agente não encontrado</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="endpoint clickable" onclick="toggleEndpoint(this)">
+            <div class="endpoint-header">
+                <span class="method delete">DELETE</span>
+                <span class="endpoint-path">/agentes/{id}</span>
+                <span class="endpoint-description">Remove um agente</span>
+            </div>
+            <div class="endpoint-details">
+                <div class="tag agentes">Agentes</div>
+                <div class="section">
+                    <h4>Parâmetros</h4>
+                    <p><strong>id</strong> (path, obrigatório): ID único do agente (UUID)</p>
+                </div>
+                <div class="section">
+                    <h4>Códigos de Resposta</h4>
+                    <div class="response-codes">
+                        <span class="status-code status-200">200</span>
+                        <span>Agente removido com sucesso</span>
+                        <span class="status-code status-404">404</span>
+                        <span>Agente não encontrado</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <h2>Endpoints - Casos</h2>
+
+        <div class="endpoint clickable" onclick="toggleEndpoint(this)">
+            <div class="endpoint-header">
+                <span class="method get">GET</span>
+                <span class="endpoint-path">/casos</span>
+                <span class="endpoint-description">Lista todos os casos</span>
+            </div>
+            <div class="endpoint-details">
+                <div class="tag casos">Casos</div>
+                <div class="section">
+                    <h4>Exemplo de Resposta (200)</h4>
+                    <div class="schema">
+[
+  {
+    "id": "f5fb2ad5-22a8-4cb4-90f2-8733517a0d46",
+    "titulo": "homicidio",
+    "descricao": "Disparos foram reportados às 22:33...",
+    "status": "aberto",
+    "agente_id": "401bccf5-cf9e-489d-8412-446cd169a0f1"
+  }
+]
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="endpoint clickable" onclick="toggleEndpoint(this)">
+            <div class="endpoint-header">
+                <span class="method get">GET</span>
+                <span class="endpoint-path">/casos/{id}</span>
+                <span class="endpoint-description">Busca um caso por ID</span>
+            </div>
+            <div class="endpoint-details">
+                <div class="tag casos">Casos</div>
+                <div class="section">
+                    <h4>Parâmetros</h4>
+                    <p><strong>id</strong> (path, obrigatório): ID único do caso (UUID)</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="endpoint clickable" onclick="toggleEndpoint(this)">
+            <div class="endpoint-header">
+                <span class="method post">POST</span>
+                <span class="endpoint-path">/casos</span>
+                <span class="endpoint-description">Cria um novo caso</span>
+            </div>
+            <div class="endpoint-details">
+                <div class="tag casos">Casos</div>
+                <div class="section">
+                    <h4>Body da Requisição</h4>
+                    <div class="schema">
+{
+  "titulo": "Roubo de veículo",
+  "descricao": "Veículo furtado na região central",
+  "status": "aberto",
+  "agente_id": "401bccf5-cf9e-489d-8412-446cd169a0f1"
+}
+                    </div>
+                </div>
+                <div class="section">
+                    <h4>Campos Obrigatórios</h4>
+                    <ul>
+                        <li><strong>titulo:</strong> Título do caso</li>
+                        <li><strong>descricao:</strong> Descrição detalhada</li>
+                        <li><strong>agente_id:</strong> ID do agente responsável (UUID)</li>
+                    </ul>
+                    <p><strong>status</strong> é opcional (padrão: "aberto")</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="endpoint clickable" onclick="toggleEndpoint(this)">
+            <div class="endpoint-header">
+                <span class="method put">PUT</span>
+                <span class="endpoint-path">/casos/{id}</span>
+                <span class="endpoint-description">Atualiza um caso existente</span>
+            </div>
+            <div class="endpoint-details">
+                <div class="tag casos">Casos</div>
+                <div class="section">
+                    <h4>Parâmetros</h4>
+                    <p><strong>id</strong> (path, obrigatório): ID único do caso (UUID)</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="endpoint clickable" onclick="toggleEndpoint(this)">
+            <div class="endpoint-header">
+                <span class="method delete">DELETE</span>
+                <span class="endpoint-path">/casos/{id}</span>
+                <span class="endpoint-description">Remove um caso</span>
+            </div>
+            <div class="endpoint-details">
+                <div class="tag casos">Casos</div>
+                <div class="section">
+                    <h4>Parâmetros</h4>
+                    <p><strong>id</strong> (path, obrigatório): ID único do caso (UUID)</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="info-box" style="margin-top: 40px;">
+            <h3>Esquemas de Dados</h3>
+            
+            <h4>Agente</h4>
+            <div class="schema">
+{
+  "id": "string (UUID)",
+  "nome": "string",
+  "dataDeIncorporacao": "string (YYYY/MM/DD)",
+  "cargo": "delegado | investigador | perito | agente | auxiliar"
+}
+            </div>
+            
+            <h4>Caso</h4>
+            <div class="schema">
+{
+  "id": "string (UUID)",
+  "titulo": "string",
+  "descricao": "string",
+  "status": "aberto | fechado | em_andamento",
+  "agente_id": "string (UUID)"
+}
+            </div>
+            
+            <h4>Erro</h4>
+            <div class="schema">
+{
+  "status": "error",
+  "statusCode": "number",
+  "message": "string"
+}
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleEndpoint(element) {
+            element.classList.toggle('active');
+        }
+    </script>
+</body>
+</html>

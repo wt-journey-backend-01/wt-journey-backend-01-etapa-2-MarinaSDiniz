@@ -7,6 +7,78 @@ A Polícia está modernizando seus sistemas e criou um novo serviço digital par
 
 Você foi convocado para desenvolver a **primeira versão da API REST**, que permitirá aos investigadores cadastrar, consultar e atualizar informações — tudo operando em um servidor **Node.js com Express**.
 
+## 📚 Documentação da API
+
+### Como executar o projeto:
+
+```bash
+# Instalar dependências
+npm install
+
+# Executar o servidor
+npm start
+
+# Executar em modo de desenvolvimento (com watch)
+npm run dev
+```
+
+### Acessar a documentação:
+
+- **Servidor:** http://localhost:3000
+- **Documentação completa:** http://localhost:3000/api-docs
+
+### Endpoints disponíveis:
+
+#### Agentes
+- `GET /agentes` - Lista todos os agentes
+- `GET /agentes/:id` - Busca agente por ID
+- `POST /agentes` - Cria novo agente
+- `PUT /agentes/:id` - Atualiza agente
+- `DELETE /agentes/:id` - Remove agente
+
+#### Casos
+- `GET /casos` - Lista todos os casos
+- `GET /casos/:id` - Busca caso por ID
+- `POST /casos` - Cria novo caso
+- `PUT /casos/:id` - Atualiza caso
+- `DELETE /casos/:id` - Remove caso
+
+### Exemplos de uso:
+
+#### Criar um novo agente:
+```bash
+curl -X POST http://localhost:3000/agentes \
+  -H "Content-Type: application/json" \
+  -d '{
+    "nome": "João Silva",
+    "dataDeIncorporacao": "2024/01/15",
+    "cargo": "agente"
+  }'
+```
+
+#### Criar um novo caso:
+```bash
+curl -X POST http://localhost:3000/casos \
+  -H "Content-Type: application/json" \
+  -d '{
+    "titulo": "Roubo de veículo",
+    "descricao": "Veículo furtado na região central",
+    "agente_id": "401bccf5-cf9e-489d-8412-446cd169a0f1"
+  }'
+```
+
+### Estrutura do projeto:
+
+```
+├── controllers/     # Lógica de negócio
+├── repositories/    # Acesso aos dados
+├── routes/         # Definição das rotas
+├── utils/          # Utilitários (errorHandler)
+├── docs/           # Documentação da API
+├── server.js       # Arquivo principal
+└── package.json    # Dependências
+```
+
 ---
 
 ## 🎯 Objetivo
