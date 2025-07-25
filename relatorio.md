@@ -1,191 +1,215 @@
 <sup>Esse é um feedback gerado por IA, ele pode conter erros.</sup>
 
-Você tem 8 créditos restantes para usar o sistema de feedback AI.
+Você tem 7 créditos restantes para usar o sistema de feedback AI.
 
 # Feedback para MarinaSDiniz:
 
-Nota final: **64.9/100**
+Nota final: **62.2/100**
 
-# Feedback para MarinaSDiniz 🚓✨
+Olá, MarinaSDiniz! 👋✨
 
-Olá, Marina! Que jornada incrível você está trilhando no mundo das APIs com Node.js e Express! 🎉 Antes de mais nada, quero te parabenizar pelo empenho e pela organização geral do seu projeto. Você estruturou bem as pastas, separou rotas, controllers e repositories, e isso é fundamental para manter o código limpo e escalável. 👏
-
----
-
-## 🎯 Pontos Fortes que Merecem Destaque
-
-- **Estrutura Modular:** Você organizou suas rotas (`routes`), controladores (`controllers`) e repositórios (`repositories`) conforme esperado, o que é ótimo para manter o projeto organizado e facilitar a manutenção.
-- **Validações e Tratamento de Erros:** Vejo que você implementou várias validações importantes, como verificar formatos de datas, cargos válidos, status válidos, e também lançou erros com mensagens personalizadas e status HTTP corretos. Isso mostra um cuidado grande com a qualidade da API.
-- **Endpoints Básicos Funcionando:** Os endpoints de leitura (GET) para agentes e casos estão funcionando bem, assim como a criação de casos e os retornos de erro para payloads inválidos.
-- **Documentação Swagger:** A inclusão da documentação via Swagger é um diferencial e ajuda muito a entender e testar sua API.
-- **Filtros e Ordenações:** Você já implementou filtros e ordenações básicas para agentes e casos, o que é um passo importante para tornar a API mais útil.
+Primeiro, parabéns pelo esforço e dedicação na construção dessa API para o Departamento de Polícia! 🎉 Você estruturou o projeto de forma muito organizada, separando bem as responsabilidades entre **rotas**, **controllers** e **repositories** — isso é fundamental para manter um código limpo e fácil de manter. Também achei ótimo que você implementou validações detalhadas e tratamento de erros personalizados, além de ter uma documentação Swagger bem estruturada nas rotas! 📚👏
 
 ---
 
-## 🕵️‍♀️ Análise Profunda dos Pontos que Precisam de Atenção
+## O que você mandou muito bem! 🚀
 
-### 1. Atualização e Deleção de Agentes — Problemas nos Métodos PUT, PATCH e DELETE
+- A arquitetura modular está bem definida: `routes`, `controllers`, `repositories` e `utils` estão no lugar certo, conforme o esperado.
+- Implementação dos endpoints básicos para `/agentes` e `/casos` está presente e coerente.
+- Validações de dados (datas, cargos, status) estão bem cuidadas, com mensagens claras de erro.
+- Uso correto dos códigos HTTP (como 200, 201, 400, 404) na maioria dos casos.
+- Tratamento de erros centralizado via middleware (`errorHandler`), que é uma ótima prática.
+- Implementação de filtros e ordenação nos endpoints (mesmo que com alguns detalhes a ajustar).
+- Inclusão da documentação da API via Swagger, o que mostra preocupação com a usabilidade da API.
 
-Você implementou os métodos de atualização (`PUT` e `PATCH`) e remoção (`DELETE`) para agentes no `agentesController.js` e as rotas correspondentes estão corretamente configuradas em `agentesRoutes.js`. Isso é ótimo! Porém, percebi que alguns testes relacionados a atualização e deleção de agentes não passam, indicando que a lógica pode estar incompleta ou com comportamentos inesperados.
+Você também implementou alguns bônus, como filtros e ordenação, o que é excelente para seu aprendizado e para deixar a API mais robusta! 🌟
 
-**Causa raiz provável:**  
-Olhando para os métodos `updateAgente` e `patchAgente`, a validação parece estar correta, mas talvez o repositório `agentesRepository.js` não esteja atualizando o array em memória conforme esperado, ou o tratamento de erros pode não estar respondendo com o status correto em algumas situações.
+---
 
-**Exemplo do método update:**
+## Agora, vamos analisar juntos os pontos que precisam de atenção para você destravar 100% da sua API! 🕵️‍♀️🔍
+
+### 1. Atualização completa e parcial (PUT e PATCH) para agentes e casos — alguns erros de validação e tratamento
+
+Percebi que os endpoints para atualização de agentes e casos estão implementados, mas alguns testes de atualização com payloads incorretos ou IDs inexistentes falham. Isso indica que seu código não está tratando todos os casos de erro corretamente.
+
+Por exemplo, no `agentesController.js`, no método `updateAgente`:
 
 ```js
-function update(id, dadosAtualizados) {
-    const index = agentes.findIndex(agente => agente.id === id);
-    if (index !== -1) {
-        agentes[index] = { ...agentes[index], ...dadosAtualizados };
-        return agentes[index];
+const updateAgente = (req, res, next) => {
+    // ...
+    const { nome, dataDeIncorporacao, cargo } = dadosAtualizados;
+    if (!nome || !dataDeIncorporacao || !cargo) {
+        throw new APIerror('PUT requer todos os campos: nome, dataDeIncorporacao, cargo', 400);
     }
-    return null;
+    // ...
 }
 ```
 
-Esse trecho está correto para atualizar o agente no array, mas é importante garantir que o `dadosAtualizados` esteja no formato esperado e que o controller esteja tratando corretamente os erros.
+Aqui você exige que **todos os campos estejam presentes** no PUT, o que está correto. Porém, em alguns momentos, se o corpo da requisição estiver vazio ou mal formatado, seu código pode não estar retornando o erro 400 corretamente ou pode estar permitindo atualizações inválidas.
 
-**Sugestão:**  
-- Verifique se o payload enviado para atualização está sendo validado antes de chamar o repositório.  
-- Confirme que o middleware de tratamento de erros (`errorHandler`) está configurado para enviar o status correto e a mensagem personalizada.  
-- Teste manualmente os endpoints PUT e PATCH para agentes, enviando payloads válidos e inválidos, e veja se os retornos estão conforme esperado.
+👉 **Dica:** Você já verifica se o payload está vazio no começo, mas é importante garantir que o corpo da requisição seja um objeto JSON válido e que os campos estejam no formato correto. Também vale reforçar a validação de tipos e formatos para cada campo antes de seguir com a atualização.
 
-**Recurso recomendado:**  
-Para aprofundar na validação e tratamento de erros, recomendo assistir este vídeo:  
-👉 [Validação de dados em APIs Node.js/Express](https://youtu.be/yNDCRAz7CM8?si=Lh5u3j27j_a4w3A_)
+Para PATCH, você trata parcialmente os campos, o que está correto, mas novamente é fundamental garantir que o payload não esteja vazio e que os campos estejam validados, o que você já faz, mas talvez precise revisar a lógica para não deixar passar casos inválidos.
 
 ---
 
-### 2. Atualização e Deleção de Casos — Status e Validação
+### 2. Exclusão de agentes e casos — cuidado com a verificação da existência
 
-Você implementou todos os endpoints para o recurso `/casos` no `casosController.js` e as rotas estão presentes em `casosRoutes.js`. Isso é excelente! A maioria dos testes para casos passa, inclusive criação, leitura e atualização.
-
-**Porém, notei um detalhe importante no método de validação do status do caso:**
+No `deleteAgente` e `deleteCaso`, você verifica se o recurso existe antes de deletar, o que é ótimo:
 
 ```js
-function isValidStatus(status) {
-    const validStatus = ['aberto', 'fechado', 'solucionado'];
-    return validStatus.includes(status.toLowerCase());
+const deleteAgente = (req, res, next) => {
+    // ...
+    const agenteExistente = agentesRepository.findById(id);
+    if (!agenteExistente) {
+        throw new APIerror('Agente não encontrado', 404);
+    }
+    // ...
 }
 ```
 
-Enquanto isso, na documentação Swagger do recurso `/casos`, o enum de status esperado é:
+Porém, no `deleteCaso`, você não faz essa verificação antes de deletar:
 
-```yaml
-status:
-  type: string
-  enum: [aberto, fechado, em_andamento]
+```js
+const deleteCaso = (req, res, next) => {
+    const casoRemovido = casosRepository.deleteById(id);
+    if (!casoRemovido) {
+        throw new APIerror('Caso não encontrado', 404);
+    }
+    // ...
+}
 ```
 
-Ou seja, você tem um pequeno desalinhamento entre o que o código aceita (`solucionado`) e o que a documentação mostra (`em_andamento`). Isso pode gerar confusão e falhas em validações.
-
-**Sugestão:**  
-- Alinhe os valores válidos de `status` tanto no código quanto na documentação.  
-- Se o requisito oficial pede `em_andamento`, substitua `solucionado` por `em_andamento` na função `isValidStatus`.
+Aqui, a verificação é feita após a tentativa de exclusão, o que pode funcionar, mas é mais seguro e claro verificar antes, como fez para agentes. Isso evita manipulações desnecessárias no array e deixa o código mais legível.
 
 ---
 
-### 3. Filtros e Ordenações — Implementação Parcial dos Bônus
+### 3. IDs inválidos nos casos — cuidado com UUIDs mal formados no array inicial
 
-Você já implementou filtros para agentes por cargo e nome, e para casos por status, agente responsável e keywords. Isso é muito bom!
-
-Porém, percebi que os testes bônus de filtragem mais complexa, como ordenação por data de incorporação em ordem crescente e decrescente para agentes, não passaram.
-
-**Analisando o código de ordenação para agentes:**
+No arquivo `repositories/casosRepository.js`, notei que alguns IDs no array inicial de casos não são UUIDs válidos, por exemplo:
 
 ```js
-if (ordenar === 'dataIncorporacao' || ordenar === 'data') {
+{
+    id: "b2c3d4e5-6f7g-8h9i-0j1k-2l3m4n5o6p7q", // contém letras inválidas para UUID
+    // ...
+},
+{
+    id: "d7e8f9g0-h1i2-j3k4-l5m6-n7o8p9q0r1s2", // idem
+    // ...
+}
+```
+
+Isso pode causar falhas na busca por ID e na validação, porque o formato UUID esperado é padrão e essas strings contêm caracteres inválidos para UUID.
+
+👉 **Solução:** Corrija os IDs para UUIDs válidos, por exemplo, usando o `uuidv4()` para gerar novos IDs válidos.
+
+Exemplo:
+
+```js
+{
+    id: "b2c3d4e5-6f7a-8b9c-0d1e-2f3a4b5c6d7e", // UUID válido
+    // ...
+}
+```
+
+Isso vai garantir que buscas por ID funcionem corretamente e que os testes que verificam UUIDs passem.
+
+---
+
+### 4. Filtros e ordenação — alguns parâmetros podem não estar funcionando como esperado
+
+Você implementou filtros e ordenação tanto para agentes quanto para casos, o que é fantástico! Porém, percebi que alguns parâmetros de ordenação e filtros podem não estar sendo interpretados corretamente.
+
+Por exemplo, no filtro de agentes por data de incorporação, você aceita parâmetros como `data`, `data_asc`, `data_desc`, mas no código:
+
+```js
+case 'data':
+case 'dataincorporacao':
+case 'data_asc':
     agentes.sort((a, b) => new Date(a.dataDeIncorporacao) - new Date(b.dataDeIncorporacao));
-} else if (ordenar === 'nome') {
-    agentes.sort((a, b) => a.nome.localeCompare(b.nome));
-}
+    break;
+case 'data_desc':
+case 'dataincorporacao_desc':
+    agentes.sort((a, b) => new Date(b.dataDeIncorporacao) - new Date(a.dataDeIncorporacao));
+    break;
 ```
 
-Aqui você só implementou ordenação crescente por data. Para passar nos testes bônus, seria interessante:
+Alguns testes podem estar esperando exatamente `data_asc` e `data_desc`, então é importante garantir que os nomes usados estejam coerentes com os parâmetros que o cliente da API irá enviar.
 
-- Implementar ordenação decrescente (ex: `ordenar=data_desc` ou outro parâmetro que você definir).  
-- Tratar melhor os filtros combinados (ex: filtrar por cargo + ordenar por data).
-
-**Para os casos, a ordenação por data está implementada em ordem decrescente, o que é correto:**
+Além disso, no filtro de casos, você tem:
 
 ```js
-if (ordenar === 'data') {
+case 'data':
+case 'data_desc':
     casos.sort((a, b) => new Date(b.dataOcorrencia) - new Date(a.dataOcorrencia)); // Mais recentes primeiro
-} else if (ordenar === 'titulo') {
-    casos.sort((a, b) => a.titulo.localeCompare(b.titulo));
+    break;
+case 'data_asc':
+    casos.sort((a, b) => new Date(a.dataOcorrencia) - new Date(b.dataOcorrencia)); // Mais antigos primeiro
+    break;
+```
+
+Aqui, o parâmetro `data` está sendo tratado como `data_desc` (mais recentes primeiro), o que pode ser confuso. Seria interessante documentar claramente esse comportamento ou aceitar explicitamente `data_desc` e `data_asc`.
+
+---
+
+### 5. Mensagens de erro customizadas para filtros e parâmetros inválidos
+
+Você implementou mensagens de erro personalizadas para parâmetros inválidos, o que é excelente para a experiência do usuário da API! Porém, alguns testes indicam que essas mensagens podem não estar sendo disparadas corretamente para todos os casos de filtros inválidos — especialmente nos filtros de casos e agentes.
+
+Por exemplo, no `getAllCasos`:
+
+```js
+if (!isValidStatus(status)) {
+    throw new APIerror('Status inválido. Valores permitidos: aberto, fechado, em_andamento', 400);
 }
 ```
 
-Mas os testes bônus indicam que ainda falta implementar filtros mais avançados e mensagens de erro customizadas para argumentos inválidos.
-
-**Recurso recomendado:**  
-Para entender melhor como implementar filtros e ordenações complexas, recomendo:  
-👉 [Manipulação de Arrays no JavaScript](https://youtu.be/glSgUKA5LjE?si=t9G2NsC8InYAU9cI)
+Isso está correto, mas é importante garantir que a validação seja feita sempre que o parâmetro estiver presente e que o erro seja retornado corretamente.
 
 ---
 
-### 4. Validação dos Campos Obrigatórios e Formato dos Payloads
+### 6. Pequena melhoria na padronização das datas
 
-Você fez um ótimo trabalho validando os campos obrigatórios, formatos de data e cargos. Porém, alguns testes indicam que sua API não está retornando status 400 em todos os casos de payload mal formatado durante atualizações (`PUT` e `PATCH`), especialmente para agentes.
-
-**Causa raiz provável:**  
-No seu controller, você valida os campos, mas não parece haver uma validação rígida para o formato completo do payload, como por exemplo, garantir que o tipo do campo é string, que não existam campos extras, ou que o payload não esteja vazio.
-
-**Sugestão:**  
-- Considere usar uma biblioteca de validação como `Joi` ou `Yup` para garantir a estrutura e o formato dos dados recebidos.  
-- Ou implemente uma validação manual mais robusta para garantir que o payload enviado no `PUT` e `PATCH` tenha os campos corretos e no formato correto.
-
-**Recurso recomendado:**  
-Para aprender sobre validação de dados em APIs Express, veja:  
-👉 [Validação de dados em APIs Node.js/Express](https://youtu.be/yNDCRAz7CM8?si=Lh5u3j27j_a4w3A_)
+Você usa formatos mistos de datas no array de agentes (`"1992/10/04"`) e no array de casos (`"2007-07-10"`). Seria legal padronizar para o formato ISO `YYYY-MM-DD` em todos os dados para evitar confusão e facilitar comparações.
 
 ---
 
-### 5. Pequeno Detalhe na Estrutura de Diretórios
+## Recomendações de estudos para você se aprofundar e corrigir esses pontos:
 
-Sua estrutura está praticamente perfeita e segue o esperado. Só um ponto para reforçar: o arquivo `docs/swagger.js` está ausente, e você tem um arquivo `docs/api-documentation.html`. Isso não é um erro, mas a prática recomendada é usar o `swagger.js` para gerar a documentação dinamicamente e servir via Swagger UI.
-
-Se quiser melhorar ainda mais, considere criar o arquivo `swagger.js` que configura o Swagger com `swagger-jsdoc` e `swagger-ui-express` para servir a documentação de forma mais dinâmica.
-
----
-
-## 📚 Recursos para Você Aprofundar e Melhorar
-
-- **Express Routing e Estruturação de APIs:**  
-  https://expressjs.com/pt-br/guide/routing.html  
-  https://youtu.be/bGN_xNc4A1k?si=Nj38J_8RpgsdQ-QH (Arquitetura MVC)
-
-- **Validação e Tratamento de Erros:**  
+- Para entender melhor como validar e tratar erros HTTP 400 e 404, recomendo o artigo da MDN:  
   https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Status/400  
-  https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Status/404  
-  https://youtu.be/yNDCRAz7CM8?si=Lh5u3j27j_a4w3A_
+  https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Status/404
 
-- **Manipulação de Arrays para Filtros e Ordenações:**  
+- Para aprimorar o uso de rotas e middlewares no Express.js, veja a documentação oficial:  
+  https://expressjs.com/pt-br/guide/routing.html
+
+- Para validar e manipular arrays e objetos em memória, este vídeo é ótimo:  
   https://youtu.be/glSgUKA5LjE?si=t9G2NsC8InYAU9cI
 
-- **Conceitos Básicos de API REST e Express:**  
-  https://youtu.be/RSZHvQomeKE  
-  https://youtu.be/--TQwiNIw28
+- Para entender melhor a arquitetura MVC aplicada a Node.js/Express, recomendo:  
+  https://youtu.be/bGN_xNc4A1k?si=Nj38J_8RpgsdQ-QH
+
+- Para aprimorar a manipulação de payloads JSON e validações:  
+  https://youtu.be/yNDCRAz7CM8?si=Lh5u3j27j_a4w3A_
 
 ---
 
-## 🔍 Resumo dos Principais Pontos para Focar
+## Resumo rápido dos principais pontos para focar:
 
-- [ ] Ajustar a validação e o tratamento de erros nos métodos de atualização (`PUT` e `PATCH`) e deleção (`DELETE`) para agentes, garantindo status 400 para payloads inválidos e 404 para IDs inexistentes.  
-- [ ] Alinhar os valores válidos do campo `status` em casos entre código e documentação (usar `em_andamento` em vez de `solucionado` se for o esperado).  
-- [ ] Implementar ordenação decrescente e filtros mais avançados para agentes e casos para conquistar os bônus.  
-- [ ] Tornar a validação dos payloads mais robusta, garantindo que o formato e os campos estejam corretos antes de atualizar recursos.  
-- [ ] Considerar gerar a documentação Swagger dinamicamente com um arquivo `swagger.js` para facilitar manutenção e testes.
+- ✅ Corrigir os IDs inválidos no array inicial de casos para UUIDs válidos.
+- ✅ Reforçar validações nos métodos PUT e PATCH para garantir que payloads vazios ou mal formatados retornem erro 400.
+- ✅ Ajustar a verificação de existência antes de deletar casos, para manter consistência com agentes.
+- ✅ Padronizar os formatos de data para evitar confusões na ordenação e comparação.
+- ✅ Revisar filtros e ordenações para aceitar e tratar corretamente os parâmetros esperados.
+- ✅ Garantir que mensagens de erro personalizadas sejam acionadas em todos os casos de parâmetros inválidos.
 
 ---
 
-Marina, você está no caminho certo e já construiu uma base sólida para essa API! 🚀 Com esses ajustes, sua aplicação vai ficar muito mais robusta, elegante e alinhada com as boas práticas. Continue praticando e explorando esses conceitos — seu esforço vai valer muito a pena! 💪
+Marina, você está no caminho certo! 🚀 Seu código demonstra que você compreendeu muitos conceitos importantes e já aplicou boas práticas essenciais para APIs RESTful. Com esses ajustes, sua API vai ficar ainda mais robusta, confiável e profissional.
 
-Se precisar de ajuda para implementar alguma dessas melhorias, estou aqui para te ajudar! Vamos juntos nessa jornada! 🤝✨
+Continue firme nessa jornada de aprendizado! Se precisar de ajuda para entender algum ponto, estou aqui para te ajudar. Vamos juntos transformar cada desafio em uma vitória! 💪💙
 
-Um abraço virtual,  
-Seu Code Buddy 👩‍💻🕵️‍♂️
+Um abraço de Code Buddy! 🤖✨
 
 > Caso queira tirar uma dúvida específica, entre em contato com o Chapter no nosso [discord](https://discord.gg/DryuHVnz).
 
