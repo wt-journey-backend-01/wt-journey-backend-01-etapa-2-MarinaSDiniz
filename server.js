@@ -6,7 +6,7 @@ const path = require('path');
 const app = express();
 const agentesRouter = require("./routes/agentesRoutes")
 const casosRouter = require("./routes/casosRoutes")
-const errorHandler = require("./utils/errorHandler")
+const { errorHandler } = require("./utils/errorHandler")
 const PORT = 3000;
 
 app.use(express.json());

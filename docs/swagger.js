@@ -7,10 +7,10 @@ const options = {
     info: {
       title: 'API do Departamento de Polícia',
       version: '1.0.0',
-      description: 'API para gerenciamento de agentes e casos do Departamento de Polícia',
+      description: 'API para gerenciamento de agentes e casos do departamento de polícia',
       contact: {
         name: 'Marina Diniz',
-        email: 'marina@policia.gov.br'
+        email: 'marina@departamento.gov.br'
       }
     },
     servers: [

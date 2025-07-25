@@ -18,6 +18,80 @@ npm install
 # Executar o servidor
 npm start
 
+# O servidor estará disponível em http://localhost:3000
+```
+
+### 🔍 Funcionalidades Implementadas
+
+- ✅ **API REST completa** com todos os métodos HTTP (GET, POST, PUT, PATCH, DELETE)
+- ✅ **Validação rigorosa de dados** com verificação de formatos e regras de negócio
+- ✅ **Integridade referencial** entre agentes e casos  
+- ✅ **Filtros avançados** e busca por parâmetros
+- ✅ **Tratamento de erros** centralizado e robusto
+- ✅ **Documentação HTML** interativa da API
+- ✅ **UUIDs válidos** para todos os registros
+- ✅ **Estrutura MVC** bem organizada
+
+### 🎯 Endpoints Disponíveis
+
+#### **Agentes**
+- `GET /agentes` - Listar todos os agentes (com filtros opcionais)
+  - Query params: `cargo`, `ordenar`, `busca`
+- `GET /agentes/:id` - Buscar agente por ID
+- `POST /agentes` - Criar novo agente
+- `PUT /agentes/:id` - Atualizar agente completo  
+- `PATCH /agentes/:id` - Atualizar agente parcial
+- `DELETE /agentes/:id` - Remover agente
+
+#### **Casos**
+- `GET /casos` - Listar todos os casos (com filtros opcionais)
+  - Query params: `status`, `agente_id`, `keyword`, `ordenar`
+- `GET /casos/:id` - Buscar caso por ID
+- `POST /casos` - Criar novo caso
+- `PUT /casos/:id` - Atualizar caso completo
+- `PATCH /casos/:id` - Atualizar caso parcial  
+- `DELETE /casos/:id` - Remover caso
+
+### 📖 Documentação
+
+Acesse a documentação interativa em: **http://localhost:3000/api-docs**
+
+### 🔧 Validações Implementadas
+
+#### **Agentes:**
+- Nome, data de incorporação e cargo são obrigatórios
+- Data de incorporação deve ser válida e não pode ser no futuro
+- Cargo deve ser um dos valores: `delegado`, `investigador`, `perito`, `agente`, `auxiliar`
+- ID não pode ser alterado em operações PUT/PATCH
+
+#### **Casos:**
+- Título, descrição e agente_id são obrigatórios
+- agente_id deve referenciar um agente existente (integridade referencial)
+- Status deve ser um dos valores: `aberto`, `fechado`, `solucionado`
+- ID não pode ser alterado em operações PUT/PATCH
+
+### 🎯 Exemplos de Uso
+
+#### Criar um agente:
+```bash
+POST /agentes
+{
+  "nome": "João Silva",
+  "dataDeIncorporacao": "2020-01-15", 
+  "cargo": "investigador"
+}
+```
+
+#### Filtrar casos por status:
+```bash
+GET /casos?status=aberto&ordenar=data
+```
+
+#### Buscar agentes por cargo:
+```bash  
+GET /agentes?cargo=delegado&ordenar=nome
+```
+
 # Executar em modo de desenvolvimento (com watch)
 npm run dev
 ```
